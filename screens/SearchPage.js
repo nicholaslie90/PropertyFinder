@@ -2,7 +2,7 @@
 
 
 import React, { Component } from 'react';
-import { ActivityIndicator, BackAndroid, Image, Platform, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import { ActivityIndicator, BackAndroid, Image, Platform, StyleSheet, Text, TextInput, TouchableHighlight, ToolbarAndroid, View } from 'react-native';
 import SearchResults from './SearchResults';
 import ImageHouse from './../Resources/house.png';
 
@@ -14,11 +14,19 @@ const styles = StyleSheet.create({
     color: '#656565',
   },
   container: {
-    backgroundColor: '#FFFFFF',
     padding: 30,
-    marginTop: 65,
+    ...Platform.select({
+      ios: {
+        marginTop: 65,
+      },
+    }),
     alignItems: 'center',
+  },
+  containerToolbar: {
+    backgroundColor: '#FFFFFF',
+    alignItems: 'stretch',
     flex: 1,
+    justifyContent: 'flex-start',
   },
   flowRight: {
     flexDirection: 'row',
@@ -49,6 +57,11 @@ const styles = StyleSheet.create({
     borderColor: '#48BBEC',
     borderWidth: 1,
     borderRadius: 8,
+    ...Platform.select({
+      android: {
+        marginTop: 10,
+      },
+    }),
     marginBottom: 10,
     alignSelf: 'stretch',
     justifyContent: 'center',
@@ -63,6 +76,10 @@ const styles = StyleSheet.create({
     borderColor: '#48BBEC',
     borderRadius: 8,
     color: '#48BBEC',
+  },
+  toolbar: {
+    backgroundColor: '#e9eaed',
+    height: 56,
   },
   image: {
     width: 217,
@@ -158,33 +175,56 @@ class SearchPage extends Component {
     return true;
   }
 
+  _initAndroidToolbar = () => {
+    if (Platform.OS === 'android') {
+      return (
+        <ToolbarAndroid
+          title="Property Finder"
+          actions={[{ title: 'Settings', show: 'always' }]}
+          onActionSelected={this.onActionSelected}
+          style={styles.toolbar}
+        />
+      );
+    }
+    return null;
+  }
+
+  onActionSelected = (position) => {
+    if (position === 0) { // index of 'Settings'
+    //   showSettings();
+    }
+  }
+
   render() {
     const spinner = this.state.isLoading ? (<ActivityIndicator size="large" />) : (<View />);
     return (
-      <View style={styles.container}>
-        <Text style={styles.description}>Search for houses to buy!</Text>
-        <Text style={styles.description}>Search by place-name, postcode or search near your location.</Text>
-        <View style={styles.flowRight}>
-          <TextInput
-            style={styles.searchInput} value={this.state.searchString}
-            onChange={this.onSearchTextChanged} placeholder="Search via name or postcode"
-          />
+      <View style={styles.containerToolbar}>
+        {this._initAndroidToolbar()}
+        <View style={styles.container}>
+          <Text style={styles.description}>Search for houses to buy!</Text>
+          <Text style={styles.description}>Search by place-name, postcode or search near your location.</Text>
+          <View style={styles.flowRight}>
+            <TextInput
+              style={styles.searchInput} value={this.state.searchString}
+              onChange={this.onSearchTextChanged} placeholder="Search via name or postcode"
+            />
+            <TouchableHighlight
+              style={styles.searchButton} underlayColor="#99d9f4"
+              onPress={this.onSearchPressed}
+            >
+              <Text style={styles.buttonText}>Go</Text>
+            </TouchableHighlight>
+          </View>
           <TouchableHighlight
-            style={styles.searchButton} underlayColor="#99d9f4"
-            onPress={this.onSearchPressed}
+            style={styles.locationButton} underlayColor="#99d9f4"
+            onPress={this.onLocationPressed}
           >
-            <Text style={styles.buttonText}>Go</Text>
+            <Text style={styles.buttonText}>Location</Text>
           </TouchableHighlight>
+          <Image source={ImageHouse} style={styles.image} />
+          {spinner}
+          <Text style={styles.description}>{this.state.message}</Text>
         </View>
-        <TouchableHighlight
-          style={styles.locationButton} underlayColor="#99d9f4"
-          onPress={this.onLocationPressed}
-        >
-          <Text style={styles.buttonText}>Location</Text>
-        </TouchableHighlight>
-        <Image source={ImageHouse} style={styles.image} />
-        {spinner}
-        <Text style={styles.description}>{this.state.message}</Text>
       </View>
     );
   }

@@ -3,18 +3,26 @@
 import React, { Component } from 'react';
 import {
     BackAndroid,
+    Image,
+    ListView,
     Platform,
     StyleSheet,
-    Image,
-    View,
-    TouchableHighlight,
-    ListView,
     Text,
+    ToolbarAndroid,
+    TouchableHighlight,
+    View,
 } from 'react-native';
+import IconToolbarBack from '../Resources/android/back-button.png';
 
 const PropertyView = require('./PropertyView');
 
 const styles = StyleSheet.create({
+  containerToolbar: {
+    backgroundColor: '#FFFFFF',
+    alignItems: 'stretch',
+    flex: 1,
+    justifyContent: 'flex-start',
+  },
   thumb: {
     width: 80,
     height: 80,
@@ -39,6 +47,10 @@ const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: 'row',
     padding: 10,
+  },
+  toolbar: {
+    backgroundColor: '#e9eaed',
+    height: 56,
   },
 });
 
@@ -69,6 +81,21 @@ class SearchResults extends Component {
   _onBackPressed = () => {
     this.props.navigator.pop();
     return true;
+  }
+
+  _initAndroidToolbar = () => {
+    if (Platform.OS === 'android') {
+      return (
+        <ToolbarAndroid
+          title="Search Results"
+          onActionSelected={this.onActionSelected}
+          navIcon={IconToolbarBack}
+          style={styles.toolbar}
+          onIconClicked={this._onBackPressed}
+        />
+      );
+    }
+    return null;
   }
 
   rowPressed(listerURL) {
@@ -105,11 +132,16 @@ class SearchResults extends Component {
   }
 
   render() {
-    return (<ListView
-      dataSource={this.state.dataSource} renderRow={this.renderRow} style={{
-        backgroundColor: '#FFFFFF',
-      }}
-    />);
+    return (
+      <View style={styles.containerToolbar}>
+        {this._initAndroidToolbar()}
+        <ListView
+          dataSource={this.state.dataSource} enableEmptySections renderRow={this.renderRow} style={{
+            backgroundColor: '#FFFFFF',
+          }}
+        />
+      </View>
+    );
   }
 }
 

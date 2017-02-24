@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
-import { BackAndroid, Image, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { BackAndroid, Image, Platform, ScrollView, StyleSheet, Text, ToolbarAndroid, View } from 'react-native';
+import IconToolbarBack from '../Resources/android/back-button.png';
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 65,
+  containerToolbar: {
+    backgroundColor: '#FFFFFF',
+    alignItems: 'stretch',
+    flex: 1,
+    justifyContent: 'flex-start',
   },
   heading: {
     backgroundColor: '#F8F8F8',
@@ -32,6 +36,10 @@ const styles = StyleSheet.create({
     margin: 5,
     color: '#656565',
   },
+  toolbar: {
+    backgroundColor: '#e9eaed',
+    height: 56,
+  },
 });
 
 class PropertyView extends Component {
@@ -53,6 +61,21 @@ class PropertyView extends Component {
     return true;
   }
 
+  _initAndroidToolbar = () => {
+    if (Platform.OS === 'android') {
+      return (
+        <ToolbarAndroid
+          title={this.props.property.title}
+          navIcon={IconToolbarBack}
+          onActionSelected={this.onActionSelected}
+          style={styles.toolbar}
+          onIconClicked={this._onBackPressed}
+        />
+      );
+    }
+    return null;
+  }
+
   render() {
     const property = this.props.property;
     let stats = `${property.bedroom_number} bed ${property.property_type}`;
@@ -66,11 +89,10 @@ class PropertyView extends Component {
 
     return (
       <ScrollView
-        style={{
-          backgroundColor: '#FFFFFF',
-        }}
+        contentContainerStyle={styles.containerToolbar}
       >
-        <View style={styles.container}>
+        {this._initAndroidToolbar()}
+        <View>
           <Image
             style={styles.image} source={{
               uri: property.img_url,
